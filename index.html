@@ -1,1 +1,120 @@
-Hi
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="refresh" content="1000">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GDSC LOGO GENERATOR</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="gdsclogo.png"> <!-- Replace 'favicon.png' with your favicon image's URL -->
+    
+    <!-- Meta Description -->
+    <meta name="description" content="Generate custom QR codes with gdsc logo for your University.">
+    
+    <!-- Search Engine Indexing -->
+    <meta name="robots" content="index, follow"> <!-- You can adjust indexing settings as needed -->
+    <!--Owl Carousal Styles-->
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css" rel="stylesheet">
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" rel="stylesheet">
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css" rel="stylesheet">
+	<link href="maincss.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Include qrcode-generator library from CDN -->
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+
+</head>
+<body class="bg-light">
+    <!--Header-->
+    <nav class="navbar navbar-expand bg-light justify-content-center">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <!-- Brand/logo -->
+            <a class="navbar-brand" href="#">
+                <img src="gdsclogo.png" alt="gdsc logo" class="" style="width:60px;">
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link font-weight-bold" href="#">GDSC QR CODE GENERATOR</a>
+          </li>
+        </ul>
+      </nav>
+      <hr class="bg-primary">
+      <!--End Header-->
+      <!--Content-->
+    <div class="container h-100 mt-5">
+        <!--typing welcome text-->
+        <h2 class="text-center text-primary typing-text"></h2>
+
+        <div class="d-flex justify-content-center align-items-center" style="min-height: 50vh">
+          <div class="card mx-auto bg-light" style="width:400px">
+
+          <div class="card-body">
+            <div id="time" class="text-center text-warning mt-1"></div>
+            <form id="myForm" action="#" method="post" class="was-validated">
+              <div class="form-group mt-3">
+                <!--url link input-->
+                <input type="url" class="form-control mb-3 mr-sm-2 rounded" id="urlInput" placeholder="Url Link" name="urlInput" required>
+                </div>
+
+              <div class="form-group mt-3">
+                <!--University name input-->
+                <input type="text" class="form-control mb-3 mr-sm-2 rounded" id="universityName" placeholder="University Name" name="universityName" required>    
+              </div>
+
+              <div class="pb-3">
+                  <button type="submit" class="btn btn-success font-weight-bold d-block mx-auto">Generate</button>
+              </div>
+           </form>
+          </div>
+        </div>
+      </div>
+      </div>
+
+      <div id="qrcode"></div>
+      <!--Modal Start-->
+      <div class="modal fade" id="myModal">
+        <div class="modal-dialog">
+          <div class="modal-content">
+          
+            <!-- Modal Header -->
+            <div class="modal-header">
+              <h4 class="modal-title text-center text-primary"></h4>
+            </div>
+            
+            <!-- Modal body -->
+            <div class="modal-body text-center">
+              <!-- Container for the custom QR code with logo -->
+                <div id="qrcode-modal"></div>
+
+            </div>
+            
+            <!-- Modal footer -->
+            <nav class="navbar navbar-expand-md bg-dark navbar-dark">
+                <button id="downloadQr" class="btn btn-success font-weight-bold d-block ml-auto">Download</button>
+                <button class="btn btn-secondary ml-auto" data-dismiss="modal">Close</button>
+            </nav>
+
+          </div>
+        </div>
+        </div>
+      <!--Modal End-->
+    <!--End Content-->
+    <!--Footer-->
+    <nav class="navbar navbar-expand-sm bg-light justify-content-center fixed-bottom">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="https://amadratitus.github.io/iChris/" target="_blank">Powered By &middot; Christopher A Titus GDSC LEAD Kyambogo University &middot; aka Chris&reg;</a>
+          </li>
+        </ul>
+      </nav>
+    <!--End Footer-->
+
+<!--Javascript Files-->
+<script src="main-index.js"></script>
+<!--Script End-->
+</body>
+</html>
