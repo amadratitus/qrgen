@@ -17,13 +17,16 @@ form.addEventListener("submit", function (e) {
 
     // Validate text input (not empty)
     const isValidText = textInput.trim() !== "";
+    // Display modal if all inputs are correct, else display error messages
+    const validationResult = document.getElementById("validationResult");
+    validationResult.innerHTML = "";
 
     if (isValidUrl && isValidText) {
         // Show the Bootstrap modal
         $('#myModal').modal('show');
         // Set the modal content
         document.querySelector(".modal-title").textContent = "Success Your Qr Code Is Generated.";
-
+        validationResult.innerHTML = "";
         //CreateAndDisplayQr();
          // Text or data you want to encode
          //var text = "Hello, World!";
@@ -101,76 +104,10 @@ form.addEventListener("submit", function (e) {
         }
 
         if (!isValidText) {
-            validationResult.innerHTML += "Text input cannot be empty.<br>";
+            validationResult.innerHTML += "Enter your university name.<br>";
         }
     }
 });
-
-//Create and display qr
-function CreateAndDisplayQr(){
-    // Create a new QRCode instance
-    var qrcode = new QRCode("qrcode", {
-        urlInput: urlInput,
-        width: 200, // Width of the QR code
-        height: 200, // Height of the QR code
-    });
-
-    // Load the logo image
-    var logoImg = new Image();
-    logoImg.src = logoUrl;
-    logoImg.onload = function () {
-        // Calculate the position to center the logo in the QR code
-        var qrWidth = qrcode._htOption.width;
-        var qrHeight = qrcode._htOption.height;
-        var logoWidth = logoImg.width;
-        var logoHeight = logoImg.height;
-
-        // Calculate the scaling factor to make the logo smaller
-        var scaleFactor = 0.5; // Adjust this value to change the logo size
-
-        // Calculate the new dimensions for the logo
-        var newLogoWidth = logoWidth * scaleFactor;
-        var newLogoHeight = logoHeight * scaleFactor;
-
-        // Calculate the position to center the scaled logo
-        var xPos = (qrWidth - newLogoWidth) / 2;
-        var yPos = (qrHeight - newLogoHeight) / 2;
-
-        // Create a canvas element to overlay the logo on the QR code
-        var canvas = document.createElement("canvas");
-        canvas.width = qrWidth;
-        canvas.height = qrHeight;
-        var ctx = canvas.getContext("2d");
-
-        // Draw the QR code on the canvas
-        qrcode.makeCode(urlInput);
-        ctx.drawImage(qrcode._el.firstChild, 0, 0);
-
-        // Draw the scaled logo at the calculated position
-        ctx.drawImage(logoImg, xPos, yPos, newLogoWidth, newLogoHeight);
-
-        // Replace the QR code container element with the canvas
-        var qrcodeContainer = document.getElementById("qrcode");
-        qrcodeContainer.innerHTML = "";
-        qrcodeContainer.appendChild(canvas);
-
-        // Update the QR code in the modal
-        var qrcodeModalContainer = document.getElementById("qrcode-modal");
-        qrcodeModalContainer.innerHTML = "";
-        qrcodeModalContainer.appendChild(canvas);
-
-        // Add functionality to download the QR code
-        var downloadQRButton = document.getElementById("downloadQr");
-        downloadQRButton.addEventListener("click", function () {
-            var downloadLink = document.createElement("a");
-            downloadLink.href = canvas.toDataURL("image/png");
-            downloadLink.download = "custom_qr_code.png";
-            downloadLink.click();
-        });
-    };
-}
-
-
 
 //function to display time
 function displayTimeByUserTimezone() {
