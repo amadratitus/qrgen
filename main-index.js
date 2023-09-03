@@ -140,7 +140,7 @@ displayTimeByUserTimezone();
 // Typing text
   // script.js
   document.addEventListener("DOMContentLoaded", function () {
-    const text = "Hey there, Welcome!"; // Your desired text
+    const text = "Hi, Welcome!"; // Your desired text
 
     const typingSpeed = 100; // Adjust typing speed (milliseconds)
     const loopDelay = 5000; // Loop delay in milliseconds (5 seconds)
