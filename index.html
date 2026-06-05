@@ -49,8 +49,14 @@
                     id="qr-content"
                     placeholder="https://example.com  or any text"
                     autocomplete="off"
+                    maxlength="2953"
+                    aria-describedby="content-error content-counter"
                     required
                 >
+                <div class="field-meta-row">
+                    <span class="field-error-msg" id="content-error" role="alert" aria-live="polite"></span>
+                    <span class="field-counter" id="content-counter" aria-live="polite">0 / 2,953</span>
+                </div>
             </div>
 
             <!-- Label / filename -->
@@ -64,8 +70,14 @@
                     class="text-input"
                     id="qr-filename-label"
                     placeholder="e.g. My Website, Company, Event…"
+                    maxlength="60"
+                    aria-describedby="label-error label-counter"
                     required
                 >
+                <div class="field-meta-row">
+                    <span class="field-error-msg" id="label-error" role="alert" aria-live="polite"></span>
+                    <span class="field-counter" id="label-counter" aria-live="polite">0 / 60</span>
+                </div>
             </div>
 
             <!-- Logo upload -->
@@ -83,6 +95,7 @@
                 <button type="button" id="remove-logo-btn">
                     <i class="fas fa-times mr-1"></i>Remove logo
                 </button>
+                <span class="field-error-msg" id="logo-error" role="alert" aria-live="polite"></span>
                 <div class="ec-tip" id="logo-ec-tip">
                     <i class="fas fa-info-circle mr-1"></i>Error correction auto-set to
                     <strong>H (High)</strong> to keep the QR scannable with a logo.
@@ -102,6 +115,7 @@
                         <input type="color" id="qr-bg-color" value="#ffffff">
                     </div>
                 </div>
+                <span class="field-error-msg" id="colors-error" role="alert" aria-live="polite"></span>
             </div>
 
             <!-- Size -->
@@ -137,8 +151,8 @@
 </div>
 
 <!-- ── Result modal ──────────────────────────────────────────────────────────── -->
-<div class="modal fade" id="result-modal" tabindex="-1" role="dialog"
-     aria-labelledby="result-modal-title" aria-hidden="true">
+<div class="modal fade" id="result-modal" tabindex="-1"
+     role="dialog" aria-modal="true" aria-labelledby="result-modal-title">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
 

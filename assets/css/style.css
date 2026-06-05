@@ -297,3 +297,65 @@ input[type="range"] {
 /* ── Utility ─────────────────────────────────────────────────────────────────── */
 #clock { font-size: 0.78rem; color: var(--muted); text-align: center; margin-bottom: 1.2rem; }
 .form-field { margin-bottom: 1.1rem; }
+
+/* ── Field-level validation ──────────────────────────────────────────────────── */
+
+/* Row that holds the inline error and character counter side-by-side */
+.field-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    min-height: 1.25rem;
+    margin-top: 0.2rem;
+    gap: 0.5rem;
+}
+
+/* Inline error message */
+.field-error-msg {
+    font-size: 0.78rem;
+    color: #ef4444;
+    line-height: 1.4;
+    flex: 1;
+}
+.field-error-msg:empty { display: none; }
+
+/* Warning (non-blocking) */
+.field-warn-msg {
+    font-size: 0.78rem;
+    color: #d97706;
+    line-height: 1.4;
+    flex: 1;
+}
+.field-warn-msg:empty { display: none; }
+
+/* Character counter */
+.field-counter {
+    font-size: 0.72rem;
+    color: var(--muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.field-counter.warn { color: #d97706; font-weight: 600; }
+.field-counter.over { color: #ef4444; font-weight: 700; }
+
+/* Input state rings */
+.text-input.is-invalid,
+.upload-zone.is-invalid {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 3px rgba(239,68,68,0.13) !important;
+}
+.text-input.is-invalid:focus {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 3px rgba(239,68,68,0.2) !important;
+}
+.upload-zone.is-invalid { background: #fef2f2; }
+
+.text-input.is-warning {
+    border-color: #d97706 !important;
+    box-shadow: 0 0 0 3px rgba(217,119,6,0.13) !important;
+}
+
+.text-input.is-valid {
+    border-color: var(--success) !important;
+    box-shadow: 0 0 0 3px rgba(16,185,129,0.12) !important;
+}
