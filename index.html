@@ -2,44 +2,48 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR Code Generator</title>
-
-    <meta name="description" content="Free online QR code generator. Add a custom logo, set a label, and download your QR code instantly.">
+    <meta name="description" content="Free online QR code generator with custom logo, colors, and instant PNG download.">
     <meta name="robots" content="index, follow">
 
-    <!-- Bootstrap -->
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
-    <!-- QRCode.js -->
-    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <!--
+        QRCode library: "qrcode" by soldair (npm).
+        Promise-based API: QRCode.toCanvas(canvas, text, options) → Promise
+        Much more reliable than the abandoned davidshimjs/qrcodejs on rawgit.
+    -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 
     <style>
         :root {
-            --primary: #4f46e5;
+            --primary:      #4f46e5;
             --primary-dark: #3730a3;
-            --accent: #06b6d4;
-            --bg: #f8fafc;
-            --card-bg: #ffffff;
-            --text: #1e293b;
-            --muted: #64748b;
-            --border: #e2e8f0;
+            --accent:       #06b6d4;
+            --bg:           #f8fafc;
+            --card-bg:      #ffffff;
+            --text:         #1e293b;
+            --muted:        #64748b;
+            --border:       #e2e8f0;
+            --success:      #10b981;
+            --success-dark: #059669;
         }
 
-        * { box-sizing: border-box; }
+        *, *::before, *::after { box-sizing: border-box; }
 
         body {
             background: var(--bg);
             color: var(--text);
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             min-height: 100vh;
-            padding-bottom: 70px;
+            padding-bottom: 68px; /* keep content above fixed footer */
         }
 
-        /* ── Navbar ── */
+        /* ── Top nav ─────────────────────────────────────────────────────── */
         .top-nav {
             background: var(--card-bg);
             border-bottom: 1px solid var(--border);
@@ -48,29 +52,38 @@
             align-items: center;
             gap: 0.75rem;
         }
-        .top-nav .brand {
+        .top-nav .nav-brand {
             font-size: 1.15rem;
             font-weight: 700;
             color: var(--primary);
             text-decoration: none;
         }
-        .top-nav .brand:hover { color: var(--primary-dark); }
+        .top-nav .nav-brand:hover { color: var(--primary-dark); }
 
-        /* ── Hero ── */
+        /* ── Hero ────────────────────────────────────────────────────────── */
         .hero {
             text-align: center;
-            padding: 2.5rem 1rem 1.5rem;
+            padding: 2.25rem 1rem 1.25rem;
         }
         .hero h1 {
-            font-size: 2rem;
+            font-size: 1.9rem;
             font-weight: 800;
             color: var(--primary);
-            margin-bottom: 0.4rem;
+            margin-bottom: 0.3rem;
         }
-        .hero p { color: var(--muted); font-size: 0.95rem; }
-        .typing-text { font-size: 1.1rem; font-weight: 600; color: var(--accent); }
+        .hero .hero-sub {
+            color: var(--muted);
+            font-size: 0.92rem;
+            margin-top: 0.2rem;
+        }
+        .typing-text {
+            min-height: 1.5rem;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--accent);
+        }
 
-        /* ── Card ── */
+        /* ── Form card ───────────────────────────────────────────────────── */
         .gen-card {
             background: var(--card-bg);
             border: 1px solid var(--border);
@@ -81,58 +94,84 @@
             box-shadow: 0 4px 24px rgba(79,70,229,0.07);
         }
 
-        .form-label {
-            font-size: 0.82rem;
-            font-weight: 600;
+        .field-label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.06em;
             color: var(--muted);
             margin-bottom: 0.35rem;
         }
 
-        .form-control {
+        .text-input {
+            width: 100%;
             border-radius: 10px;
             border: 1.5px solid var(--border);
             padding: 0.6rem 0.9rem;
             font-size: 0.95rem;
-            transition: border-color 0.2s;
+            color: var(--text);
+            background: var(--card-bg);
+            outline: none;
+            transition: border-color 0.18s, box-shadow 0.18s;
         }
-        .form-control:focus {
+        .text-input:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79,70,229,0.12);
+            box-shadow: 0 0 0 3px rgba(79,70,229,0.13);
         }
 
-        /* Logo upload area */
-        .logo-upload-area {
+        select.text-input { cursor: pointer; }
+
+        /* Logo upload zone */
+        .upload-zone {
             border: 2px dashed var(--border);
             border-radius: 10px;
-            padding: 1rem;
+            padding: 0.85rem 1rem;
             text-align: center;
             cursor: pointer;
-            transition: border-color 0.2s, background 0.2s;
             position: relative;
+            transition: border-color 0.18s, background 0.18s;
         }
-        .logo-upload-area:hover { border-color: var(--primary); background: #f5f3ff; }
-        .logo-upload-area input[type="file"] {
+        .upload-zone:hover,
+        .upload-zone.drag-over { border-color: var(--primary); background: #f5f3ff; }
+        .upload-zone input[type="file"] {
             position: absolute;
             inset: 0;
             opacity: 0;
             cursor: pointer;
+            width: 100%;
+            height: 100%;
         }
-        .logo-upload-area .upload-icon { font-size: 1.4rem; color: var(--muted); }
-        .logo-upload-area .upload-text { font-size: 0.82rem; color: var(--muted); margin-top: 0.25rem; }
-        #logoPreview {
-            width: 48px;
-            height: 48px;
+        #logo-preview {
+            width: 44px;
+            height: 44px;
             object-fit: contain;
+            border-radius: 6px;
+            margin: 0 auto 0.2rem;
             display: none;
-            border-radius: 8px;
-            margin: 0 auto 0.25rem;
         }
+        .upload-icon  { font-size: 1.3rem; color: var(--muted); }
+        .upload-hint  { font-size: 0.8rem; color: var(--muted); margin-top: 0.2rem; }
 
-        /* Color pickers */
+        #remove-logo-btn {
+            font-size: 0.78rem;
+            color: #ef4444;
+            background: none;
+            border: none;
+            padding: 0.2rem 0;
+            cursor: pointer;
+            display: none;
+        }
+        #remove-logo-btn:hover { text-decoration: underline; }
+
+        /* Color row */
         .color-row { display: flex; gap: 1rem; }
-        .color-row .color-item { flex: 1; }
+        .color-row .color-cell { flex: 1; }
+        .color-row .color-sublabel {
+            font-size: 0.72rem;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
         input[type="color"] {
             width: 100%;
             height: 38px;
@@ -140,226 +179,306 @@
             border: 1.5px solid var(--border);
             padding: 2px;
             cursor: pointer;
+            background: none;
         }
 
-        /* Size range */
-        input[type="range"] { width: 100%; accent-color: var(--primary); }
+        /* Size slider */
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        /* Error / validation box */
+        #error-box { font-size: 0.87rem; }
+        #error-box .alert {
+            border-radius: 8px;
+            padding: 0.5rem 0.9rem;
+            margin-bottom: 0.4rem;
+        }
 
         /* Generate button */
         .btn-generate {
+            width: 100%;
             background: linear-gradient(135deg, var(--primary), var(--accent));
             color: #fff;
             border: none;
             border-radius: 10px;
-            padding: 0.7rem 2rem;
+            padding: 0.72rem 2rem;
             font-weight: 700;
             font-size: 1rem;
-            width: 100%;
-            transition: opacity 0.2s, transform 0.1s;
+            cursor: pointer;
+            transition: opacity 0.18s, transform 0.1s;
         }
-        .btn-generate:hover { opacity: 0.92; transform: translateY(-1px); }
-        .btn-generate:active { transform: translateY(0); }
+        .btn-generate:hover   { opacity: 0.9; transform: translateY(-1px); }
+        .btn-generate:active  { transform: translateY(0); }
+        .btn-generate:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
 
-        .validation-msg { font-size: 0.87rem; }
-        .validation-msg .alert { border-radius: 8px; padding: 0.5rem 0.9rem; }
+        /* EC level info tip */
+        .ec-tip {
+            font-size: 0.75rem;
+            color: var(--accent);
+            margin-top: 0.3rem;
+            display: none;
+        }
+        .ec-tip.visible { display: block; }
 
-        /* ── Modal ── */
-        .modal-content { border-radius: 16px; border: none; overflow: hidden; }
+        /* ── Modal ───────────────────────────────────────────────────────── */
+        .modal-content {
+            border-radius: 16px;
+            border: none;
+            overflow: hidden;
+        }
         .modal-header {
             background: linear-gradient(135deg, var(--primary), var(--accent));
-            color: #fff;
             border: none;
             padding: 1rem 1.5rem;
         }
-        .modal-header .modal-title { font-weight: 700; font-size: 1rem; color: #fff; }
-        .modal-header .close { color: #fff; opacity: 0.8; }
-        .modal-body { background: var(--bg); padding: 1.5rem; }
-        #qrcode-modal {
+        .modal-header .modal-title {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #fff;
+        }
+        .modal-header .close { color: #fff; opacity: 0.85; }
+        .modal-header .close:hover { opacity: 1; }
+
+        .modal-body {
+            background: var(--bg);
+            padding: 1.5rem 1.5rem 1rem;
+        }
+        #modal-canvas-wrap {
             display: flex;
             justify-content: center;
             align-items: center;
         }
-        #qrcode-modal canvas {
+        #modal-canvas-wrap canvas {
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.13);
+            max-width: 100%;
+            height: auto;
         }
-        .modal-label {
+        #modal-qr-label {
+            text-align: center;
             font-size: 0.8rem;
             color: var(--muted);
-            text-align: center;
-            margin-top: 0.5rem;
+            margin-top: 0.6rem;
         }
+
         .modal-footer-bar {
             background: var(--card-bg);
             border-top: 1px solid var(--border);
             padding: 0.9rem 1.2rem;
             display: flex;
-            gap: 0.75rem;
+            gap: 0.6rem;
             justify-content: flex-end;
         }
         .btn-download {
-            background: #10b981;
+            background: var(--success);
             color: #fff;
             border: none;
             border-radius: 8px;
             padding: 0.5rem 1.2rem;
             font-weight: 600;
-            transition: background 0.2s;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.18s;
         }
-        .btn-download:hover { background: #059669; }
-        .btn-close-modal {
+        .btn-download:hover { background: var(--success-dark); }
+
+        .btn-modal-close {
             background: var(--border);
             color: var(--text);
             border: none;
             border-radius: 8px;
             padding: 0.5rem 1.2rem;
             font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
         }
+        .btn-modal-close:hover { background: #d1d5db; }
 
-        /* ── Footer ── */
-        .bottom-footer {
+        /* ── Footer ──────────────────────────────────────────────────────── */
+        .site-footer {
             position: fixed;
             bottom: 0;
             width: 100%;
             background: var(--card-bg);
             border-top: 1px solid var(--border);
             text-align: center;
-            padding: 0.55rem;
-            font-size: 0.8rem;
+            padding: 0.5rem;
+            font-size: 0.78rem;
             color: var(--muted);
         }
-        .bottom-footer a { color: var(--primary); text-decoration: none; }
-        .bottom-footer a:hover { text-decoration: underline; }
+        .site-footer a { color: var(--primary); text-decoration: none; }
+        .site-footer a:hover { text-decoration: underline; }
 
-        /* hidden placeholder for raw QR */
-        #qrcode { display: none; }
+        /* Clock */
+        #clock { font-size: 0.78rem; color: var(--muted); text-align: center; margin-bottom: 1.2rem; }
+
+        /* Form spacing */
+        .form-field { margin-bottom: 1.1rem; }
     </style>
 </head>
 <body>
 
-    <!-- Navbar -->
-    <nav class="top-nav">
-        <i class="fas fa-qrcode" style="font-size:1.4rem;color:var(--primary)"></i>
-        <a class="brand" href="#">QR Code Generator</a>
-    </nav>
+<!-- ── Top nav ──────────────────────────────────────────────────────────────── -->
+<nav class="top-nav">
+    <i class="fas fa-qrcode" style="font-size:1.35rem;color:var(--primary)"></i>
+    <a class="nav-brand" href="#">QR Code Generator</a>
+</nav>
 
-    <!-- Hero -->
-    <div class="hero">
-        <h1><i class="fas fa-qrcode mr-2"></i>QR Code Generator</h1>
-        <p class="typing-text"></p>
-        <p>Generate custom QR codes with your own logo &mdash; free &amp; instant.</p>
-    </div>
+<!-- ── Hero ─────────────────────────────────────────────────────────────────── -->
+<div class="hero">
+    <h1><i class="fas fa-qrcode mr-2"></i>QR Code Generator</h1>
+    <p class="typing-text" id="typing-text"></p>
+    <p class="hero-sub">Free &amp; instant &mdash; works for URLs, Wi-Fi, text, vCards, and more.</p>
+</div>
 
-    <!-- Main card -->
-    <div class="container">
-        <div class="gen-card">
-            <div id="time" class="text-center mb-3" style="font-size:0.8rem;color:var(--muted)"></div>
+<!-- ── Main card ────────────────────────────────────────────────────────────── -->
+<div class="container">
+    <div class="gen-card">
 
-            <form id="myForm" novalidate>
+        <div id="clock"></div>
 
-                <!-- URL -->
-                <div class="form-group">
-                    <label class="form-label" for="urlInput"><i class="fas fa-link mr-1"></i>URL / Text to encode</label>
-                    <input type="text" class="form-control" id="urlInput" placeholder="https://example.com or any text" required>
+        <form id="qr-form" novalidate>
+
+            <!-- URL / text to encode -->
+            <div class="form-field">
+                <label class="field-label" for="qr-content">
+                    <i class="fas fa-link mr-1"></i>URL or text to encode
+                </label>
+                <input
+                    type="text"
+                    class="text-input"
+                    id="qr-content"
+                    placeholder="https://example.com  or any text"
+                    autocomplete="off"
+                    required
+                >
+            </div>
+
+            <!-- Label / filename -->
+            <div class="form-field">
+                <label class="field-label" for="qr-filename-label">
+                    <i class="fas fa-tag mr-1"></i>Label <span style="text-transform:none;font-weight:400">(used in download filename)</span>
+                </label>
+                <input
+                    type="text"
+                    class="text-input"
+                    id="qr-filename-label"
+                    placeholder="e.g. My Website, Company, Event…"
+                    required
+                >
+            </div>
+
+            <!-- Logo upload -->
+            <div class="form-field">
+                <label class="field-label">
+                    <i class="fas fa-image mr-1"></i>Logo <span style="text-transform:none;font-weight:400">(optional)</span>
+                </label>
+                <div class="upload-zone" id="logo-upload-zone">
+                    <input type="file" id="logo-file-input" accept="image/*">
+                    <img id="logo-preview" src="" alt="logo preview">
+                    <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                    <div class="upload-hint" id="upload-hint-text">Click or drag an image here</div>
                 </div>
-
-                <!-- Label -->
-                <div class="form-group">
-                    <label class="form-label" for="labelInput"><i class="fas fa-tag mr-1"></i>Label (used in filename)</label>
-                    <input type="text" class="form-control" id="labelInput" placeholder="e.g. My Website, Company Name…" required>
-                </div>
-
-                <!-- Logo upload -->
-                <div class="form-group">
-                    <label class="form-label"><i class="fas fa-image mr-1"></i>Logo (optional)</label>
-                    <div class="logo-upload-area" id="logoUploadArea">
-                        <input type="file" id="logoFile" accept="image/*">
-                        <img id="logoPreview" src="" alt="logo preview">
-                        <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-                        <div class="upload-text" id="uploadText">Click or drag to upload a logo</div>
-                    </div>
-                    <button type="button" id="clearLogo" class="btn btn-sm btn-link text-danger p-0 mt-1" style="display:none;font-size:0.8rem">
-                        <i class="fas fa-times mr-1"></i>Remove logo
-                    </button>
-                </div>
-
-                <!-- Colors -->
-                <div class="form-group">
-                    <label class="form-label"><i class="fas fa-palette mr-1"></i>Colors</label>
-                    <div class="color-row">
-                        <div class="color-item">
-                            <div style="font-size:0.75rem;color:var(--muted);margin-bottom:4px">Foreground</div>
-                            <input type="color" id="fgColor" value="#000000">
-                        </div>
-                        <div class="color-item">
-                            <div style="font-size:0.75rem;color:var(--muted);margin-bottom:4px">Background</div>
-                            <input type="color" id="bgColor" value="#ffffff">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Size -->
-                <div class="form-group">
-                    <label class="form-label"><i class="fas fa-expand-alt mr-1"></i>Size: <span id="sizeValue">256</span>px</label>
-                    <input type="range" id="qrSize" min="128" max="512" value="256" step="32">
-                </div>
-
-                <!-- Error correction -->
-                <div class="form-group">
-                    <label class="form-label" for="ecLevel"><i class="fas fa-shield-alt mr-1"></i>Error correction</label>
-                    <select class="form-control" id="ecLevel">
-                        <option value="L">L – Low (7%)</option>
-                        <option value="M" selected>M – Medium (15%)</option>
-                        <option value="Q">Q – Quartile (25%)</option>
-                        <option value="H">H – High (30%)</option>
-                    </select>
-                </div>
-
-                <div class="validation-msg" id="validationResult"></div>
-
-                <button type="submit" class="btn-generate mt-2">
-                    <i class="fas fa-magic mr-2"></i>Generate QR Code
+                <button type="button" id="remove-logo-btn">
+                    <i class="fas fa-times mr-1"></i>Remove logo
                 </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Hidden QR scratch area -->
-    <div id="qrcode"></div>
-
-    <!-- Modal -->
-    <div class="modal fade" id="myModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="fas fa-check-circle mr-2"></i>Your QR Code is ready!</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body text-center">
-                    <div id="qrcode-modal"></div>
-                    <div class="modal-label" id="modalLabel"></div>
-                </div>
-                <div class="modal-footer-bar">
-                    <button id="downloadQr" class="btn-download">
-                        <i class="fas fa-download mr-1"></i>Download PNG
-                    </button>
-                    <button class="btn-close-modal" data-dismiss="modal">Close</button>
+                <div class="ec-tip" id="logo-ec-tip">
+                    <i class="fas fa-info-circle mr-1"></i>Tip: Error correction is auto-set to <strong>H (High)</strong> when a logo is used, so the QR stays scannable.
                 </div>
             </div>
+
+            <!-- Colors -->
+            <div class="form-field">
+                <span class="field-label"><i class="fas fa-palette mr-1"></i>Colors</span>
+                <div class="color-row">
+                    <div class="color-cell">
+                        <div class="color-sublabel">Foreground (dark modules)</div>
+                        <input type="color" id="qr-fg-color" value="#000000">
+                    </div>
+                    <div class="color-cell">
+                        <div class="color-sublabel">Background (light modules)</div>
+                        <input type="color" id="qr-bg-color" value="#ffffff">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Size -->
+            <div class="form-field">
+                <label class="field-label" for="qr-size-range">
+                    <i class="fas fa-expand-alt mr-1"></i>Size: <span id="qr-size-display">256</span>px
+                </label>
+                <input type="range" id="qr-size-range" min="128" max="512" value="256" step="32">
+            </div>
+
+            <!-- Error correction -->
+            <div class="form-field">
+                <label class="field-label" for="qr-ec-level">
+                    <i class="fas fa-shield-alt mr-1"></i>Error correction
+                </label>
+                <select class="text-input" id="qr-ec-level">
+                    <option value="L">L – Low (7% recovery)</option>
+                    <option value="M" selected>M – Medium (15% recovery)</option>
+                    <option value="Q">Q – Quartile (25% recovery)</option>
+                    <option value="H">H – High (30% recovery, recommended with logo)</option>
+                </select>
+            </div>
+
+            <!-- Validation messages -->
+            <div id="error-box"></div>
+
+            <button type="submit" class="btn-generate mt-1" id="generate-btn">
+                <i class="fas fa-magic mr-2"></i>Generate QR Code
+            </button>
+
+        </form>
+    </div>
+</div>
+
+<!-- ── Result modal ──────────────────────────────────────────────────────────── -->
+<div class="modal fade" id="result-modal" tabindex="-1" role="dialog" aria-labelledby="result-modal-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="result-modal-title">
+                    <i class="fas fa-check-circle mr-2"></i>Your QR code is ready!
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div id="modal-canvas-wrap"></div>
+                <div id="modal-qr-label"></div>
+            </div>
+
+            <div class="modal-footer-bar">
+                <button id="download-btn" class="btn-download">
+                    <i class="fas fa-download mr-1"></i>Download PNG
+                </button>
+                <button class="btn-modal-close" data-dismiss="modal">Close</button>
+            </div>
+
         </div>
     </div>
+</div>
 
-    <!-- Footer -->
-    <div class="bottom-footer">
-        Free QR Code Generator &mdash; <a href="https://github.com/amadratitus/qrgen" target="_blank">Open Source on GitHub</a>
-    </div>
+<!-- ── Footer ────────────────────────────────────────────────────────────────── -->
+<div class="site-footer">
+    Free QR Code Generator &mdash;
+    <a href="https://github.com/amadratitus/qrgen" target="_blank" rel="noopener">
+        Open Source on GitHub
+    </a>
+</div>
 
-    <!-- JS -->
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="main-index.js"></script>
+<!-- ── Scripts ───────────────────────────────────────────────────────────────── -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.slim.min.js"></script>
+<!-- bootstrap.bundle already includes Popper — no separate Popper needed -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="qr-generator.js"></script>
 </body>
 </html>
