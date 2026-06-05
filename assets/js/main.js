@@ -1,11 +1,11 @@
 /**
  * qr-generator.js
  *
- * Uses "qrcode" by soldair (https://github.com/soldair/node-qrcode)
- * Browser API: QRCode.toCanvas(canvas, text, options) → Promise
+ * Uses qrcode-generator by kazuhikoarase — window.qrcode(typeNumber, ecLevel)
+ * Fully synchronous canvas rendering; no CDN 404, no undefined globals.
  *
  * Flow:
- *   form submit → validate → buildQR() → (optional) overlayLogo() → showModal()
+ *   form submit → validate → buildQR() → renderToCanvas() → overlayLogo()? → showModal()
  */
 
 'use strict';
@@ -135,30 +135,79 @@ form.addEventListener('submit', function (e) {
 });
 
 // ── QR build ──────────────────────────────────────────────────────────────────
+/**
+ * Uses qrcode-generator (kazuhikoarase) — window.qrcode(typeNumber, ecLevel).
+ * typeNumber 0 = auto-select smallest type that fits the data.
+ * Rendering to canvas is fully synchronous; only the logo overlay is async.
+ */
 function buildQR({ content, label, fgColor, bgColor, size, ecLevel }) {
-    const canvas = document.createElement('canvas');
-
-    QRCode.toCanvas(canvas, content, {
-        width:                size,
-        margin:               1,
-        color:                { dark: fgColor, light: bgColor },
-        errorCorrectionLevel: ecLevel,
-    })
-    .then(function () {
-        if (logoDataUrl) {
-            return overlayLogo(canvas, logoDataUrl, bgColor);
-        }
-    })
-    .then(function () {
-        showModal(canvas, label);
-    })
-    .catch(function (err) {
-        showFormError('QR generation failed: ' + (err.message || err));
-    })
-    .finally(function () {
-        generateBtn.disabled = false;
+    function resetButton() {
+        generateBtn.disabled  = false;
         generateBtn.innerHTML = '<i class="fas fa-magic mr-2"></i>Generate QR Code';
-    });
+    }
+
+    // --- Synchronous QR matrix generation ---
+    var canvas;
+    try {
+        var qr = qrcode(0, ecLevel);   // 0 = auto type number
+        qr.addData(content);
+        qr.make();
+        canvas = renderToCanvas(qr, fgColor, bgColor, size);
+    } catch (err) {
+        showFormError('QR generation failed: ' + (err.message || String(err)));
+        resetButton();
+        return;
+    }
+
+    // --- Optional async logo overlay ---
+    if (logoDataUrl) {
+        overlayLogo(canvas, logoDataUrl, bgColor)
+            .then(function ()  { showModal(canvas, label); })
+            .catch(function () { showModal(canvas, label); })  // show without logo on error
+            .then(resetButton);
+    } else {
+        showModal(canvas, label);
+        resetButton();
+    }
+}
+
+/**
+ * Draws the QR matrix onto a new <canvas> and returns it.
+ * Adds a quiet-zone margin of 2 modules on all sides.
+ */
+function renderToCanvas(qr, fgColor, bgColor, targetSize) {
+    var margin      = 2;
+    var moduleCount = qr.getModuleCount();
+    var totalCells  = moduleCount + margin * 2;
+    var cellSize    = Math.max(2, Math.floor(targetSize / totalCells));
+    var canvasSize  = cellSize * totalCells;
+
+    var canvas  = document.createElement('canvas');
+    canvas.width  = canvasSize;
+    canvas.height = canvasSize;
+
+    var ctx = canvas.getContext('2d');
+
+    // Fill background (quiet zone + light modules)
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, canvasSize, canvasSize);
+
+    // Draw dark modules
+    ctx.fillStyle = fgColor;
+    for (var row = 0; row < moduleCount; row++) {
+        for (var col = 0; col < moduleCount; col++) {
+            if (qr.isDark(row, col)) {
+                ctx.fillRect(
+                    (col + margin) * cellSize,
+                    (row + margin) * cellSize,
+                    cellSize,
+                    cellSize
+                );
+            }
+        }
+    }
+
+    return canvas;
 }
 
 // ── Logo overlay ──────────────────────────────────────────────────────────────

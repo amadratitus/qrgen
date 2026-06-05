@@ -14,11 +14,6 @@
     <!-- App styles -->
     <link rel="stylesheet" href="assets/css/style.css">
 
-    <!--
-        QRCode library: "qrcode" by soldair (npm).
-        Promise-based: QRCode.toCanvas(canvas, text, options) → Promise
-        Loaded before </body> so it's available when main.js runs.
-    -->
 </head>
 <body>
 
@@ -184,8 +179,8 @@
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.slim.min.js"></script>
 <!-- bootstrap.bundle includes Popper — no separate Popper script needed -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-<!-- QRCode library must load before main.js -->
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<!-- qrcode-generator (kazuhikoarase) — browser-ready, no bundler needed -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script src="assets/js/main.js"></script>
 </body>
 </html>
